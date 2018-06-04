@@ -181,7 +181,7 @@ def InitRenderText():
 
     RenderText.configure(state='disabled')
 
-InitTopText()
+#InitTopText()
 InitInputLabel()
 InitSearchButton()
 InitRenderText()
