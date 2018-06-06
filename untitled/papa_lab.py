@@ -165,7 +165,7 @@ def SearchWhere():
     else:
         print("Error!")
 
-def InitRenderText():
+'''def InitRenderText():
     global RenderText
 
     RenderTextScrollbar = Scrollbar(g_Tk)
@@ -179,7 +179,7 @@ def InitRenderText():
     RenderTextScrollbar.config(command=RenderText.yview)
     RenderTextScrollbar.pack(side=RIGHT, fill=BOTH)
 
-    RenderText.configure(state='disabled')
+    RenderText.configure(state='disabled')'''
 
 #InitTopText()
 #InitInputLabel()
