@@ -184,7 +184,7 @@ def SearchWhere():
 #InitTopText()
 #InitInputLabel()
 #InitSearchButton()
-InitRenderText()
+#InitRenderText()
 #InitSendEmailButton()
 #InitSortListBox()
 #InitSortButton()
