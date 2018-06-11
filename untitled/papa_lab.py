@@ -187,5 +187,5 @@ def SearchWhere():
 #InitRenderText()
 #InitSendEmailButton()
 #InitSortListBox()
-InitSortButton()
+#InitSortButton()
 g_Tk.mainloop()
