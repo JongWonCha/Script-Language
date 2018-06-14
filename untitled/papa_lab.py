@@ -2,6 +2,11 @@ from tkinter import *
 from tkinter import font
 import urllib
 import urllib.request
+# -*- coding: utf-8 -*-
+import mimetypes
+import mysmtplib
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
 
 g_Tk = Tk()
 g_Tk.geometry("1100x800+100+100")
@@ -80,7 +85,7 @@ def onselect(evt):
     TempFont = font.Font(g_Tk, size=15, weight='bold', family='Consolas')
     selectText = Text(g_Tk, width=68, height=7, borderwidth=12, relief='ridge', font = TempFont)
 
-    selectText.insert(INSERT, '관광지명 : ')
+    selectText.insert(INSERT, '관광지 : ')
     selectText.insert(INSERT, value)
     selectText.insert(INSERT, "\n")
     selectText.insert(INSERT, '전화 : ')
@@ -91,9 +96,9 @@ def onselect(evt):
     selectText.insert(INSERT, "\n")
 
     SandDataList.clear()
-    SandDataList.append("관광지명 : "+value+"\n")
-    SandDataList.append("전화번호 : "+DataList[DataList.index(value) - 1]+"\n")
-    SandDataList.append("주소 : " + DataList[DataList.index(value) - 5] +"\n")
+    SandDataList.append(value)
+    SandDataList.append(DataList[DataList.index(value) - 1])
+    SandDataList.append( DataList[DataList.index(value) - 5])
 
     selectText.pack()
     selectText.place(x=300, y=570)
@@ -188,33 +193,41 @@ def InitsnadButton():
     SearchButton.pack()
     SearchButton.place(x=990, y=80)
 
+def InitTeleButton():
+    TempFont = font.Font(g_Tk, size=13, weight='bold', family='Consolas')
+    SearchButton = Button(g_Tk, font=TempFont, text="텔레그램", command=TeleAction)
+    SearchButton.pack()
+    SearchButton.place(x=900, y=80)
+
+def TeleAction():
+    import telebot
+
+    bot = telebot.TeleBot('618308633:AAEjq-PhyB4wCBk4QWHMDXooHTp-iDfQ0HA')
+    bot.get_me()
+    bot.send_message("518224794", "아빠 어디가?")
+
 def sandAction():
     print(SandDataList)
 
-    import mimetypes
-    import mysmtplib
-    from email.mime.base import MIMEBase
-    from email.mime.text import MIMEText
 
     # global value
     host = "smtp.gmail.com"  # Gmail STMP 서버 주소.
     port = "587"
     htmlFileName = "logo.html"
 
-    senderAddr = "hhg5632@gmail.com" # 보내는 사람 email 주소.
+    senderAddr = "chajw950@gmail.com" # 보내는 사람 email 주소.
     recipientAddr = "gagongin@naver.com"  # 받는 사람 email 주소.
 
-    test = SandDataList.encode()
-    msg = MIMEText(test)
+    msg = MIMEText("관광지명 : " + SandDataList[0] + "\n" + "전화 : " + SandDataList[1] + "\n" + "주소: " + SandDataList[2])
     #msg = MIMEBase("multipart", "alternative")
-    msg['Subject'] = "관광정보서비스안내(아빠어디가)"
+    msg['Subject'] = "아빠 어디가 이메일 왔습니다."
     msg['From'] = senderAddr
     msg['To'] = recipientAddr
 
     # MIME 문서를 생성합니다.
-    #htmlFD = open(htmlFileName, 'rb')
-    #HtmlPart = MIMEText(htmlFD.read(), 'html', _charset='UTF-8')
-    #htmlFD.close()
+    '''htmlFD = open(htmlFileName, 'rb')
+    HtmlPart = MIMEText(htmlFD.read(), 'html', _charset='UTF-8')
+    htmlFD.close()'''
 
     # 만들었던 mime을 MIMEBase에 첨부 시킨다.
     #msg.attach(HtmlPart)
@@ -224,7 +237,7 @@ def sandAction():
     s.ehlo()
     s.starttls()
     s.ehlo()
-    s.login("hhg5632@gmail.com","h2435632")
+    s.login("chajw950@gmail.com","ok1942kodk&U")
     s.sendmail(senderAddr, [recipientAddr], msg.as_string())
     s.close()
 
@@ -234,4 +247,5 @@ InitSearchButton()
 InitRenderText()
 InitSelectLabel()
 InitsnadButton()
+InitTeleButton()
 g_Tk.mainloop()
