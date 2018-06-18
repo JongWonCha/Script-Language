@@ -7,12 +7,17 @@ import mimetypes
 import mysmtplib
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+import telepot
+#from bs4 import BeautifulSoup
+import traceback
+import time
 
 g_Tk = Tk()
 g_Tk.geometry("1100x800+100+100")
 DataList = []
 SandDataList = []
 url = str("")
+bot = None
 
 def InitTopText():
     TempFont = font.Font(g_Tk, size=30, weight='bold', family = 'Consolas')
@@ -62,8 +67,9 @@ def onselect(evt):
     w = evt.widget
     index = int(w.curselection()[0])
     value = w.get(index)
-    print('You selected item %d: "%s"' % (index, value))
-    print(DataList)
+
+    #print('You selected item %d: "%s"' % (index, value))
+    #print(DataList)
     url = DataList.index(value) - 4
     url = DataList[url]
     print(url)
@@ -94,6 +100,9 @@ def onselect(evt):
     selectText.insert(INSERT, '주소 : ')
     selectText.insert(INSERT, DataList[DataList.index(value) - 5])
     selectText.insert(INSERT, "\n")
+
+    import spam
+    print(spam.pick(value))
 
     SandDataList.clear()
     SandDataList.append(value)
@@ -200,11 +209,67 @@ def InitTeleButton():
     SearchButton.place(x=900, y=80)
 
 def TeleAction():
-    import telebot
+    global bot
+    bot = telepot.Bot('618308633:AAEjq-PhyB4wCBk4QWHMDXooHTp-iDfQ0HA')
+    bot.getMe()
 
-    bot = telebot.TeleBot('618308633:AAEjq-PhyB4wCBk4QWHMDXooHTp-iDfQ0HA')
-    bot.get_me()
-    bot.send_message("518224794", "아빠 어디가?")
+    bot.message_loop(Handle)
+
+    print("Listening...")
+
+
+    #bot.sendMessage("518224794", "아빠 어디가?")
+
+
+def Handle(msg):
+    global bot
+    import http.client
+    from xml.dom.minidom import parse, parseString
+    content_type, chat_type, chat_id = telepot.glance(msg)
+    print(msg['text'])
+    if content_type != 'text':
+        bot.sendMessage("518224794", '난 텍스트 이외의 메시지는 처리하지 못해요.')
+        return
+
+
+
+    conn = None
+    path = msg['text']
+    encText = urllib.parse.quote(path)
+
+    server = "api.visitkorea.or.kr"
+    servicekey = "5um4f7TgO48adXL7VSsi25MWHSnQG9sduzwQ%2FF7x0sh3jo5Wn6BJNpFYyzc%2F%2FMOOBo3EP%2BsNiTY71km2LEWdJA%3D%3D"
+    conn = http.client.HTTPConnection(server)
+    conn.request("GET", "/openapi/service/rest/KorService/searchKeyword?serviceKey=" + servicekey +
+                 "&MobileApp=AppTest&MobileOS=ETC&pageNo=1&startPage=1&numOfRows=999&pageSize=10&listYN=Y&arrange=O&contentTypeId=12&keyword=" + encText)
+    req = conn.getresponse()
+    if int(req.status) == 200:
+        response_body = req.read().decode('utf-8')
+
+        parseData = parseString(response_body)
+
+        GeoInfoWhere = parseData.childNodes
+
+        row = GeoInfoWhere[0].childNodes[1].childNodes[0].childNodes
+
+        for item in row:
+            st = str()
+            list = item.childNodes
+            for lis in list:
+                if lis.nodeName == 'addr1':
+                    st += "주소 : " + lis.firstChild.nodeValue
+                if lis.nodeName == 'tel':
+                    st += "\n전화번호 : " + lis.firstChild.nodeValue
+                if lis.nodeName == 'title':
+                    #bot.sendMessage("518224794",lis.firstChild.nodeValue)
+                    st += "\n이름 : " + lis.firstChild.nodeValue
+                    bot.sendMessage("518224794", st)
+
+
+
+
+
+
 
 def sandAction():
     print(SandDataList)
